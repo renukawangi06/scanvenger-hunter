@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Periodic Table Quiz</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            text-align: center;          
+            background: rgba(255, 248, 240, 0.9);
+            margin: 0;
+            padding: 20px;
+            color: #4a4a4a;
+        }
+        h1 {
+            color: #3d0d1dff;
+            margin-bottom: 20px;
+        }
+        .question-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+            background-color: #fdabc6ab;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        #score {
+            margin-left: 20px;
+            font-size: 18px;
+            font-weight: 600;
+            color: #4a148c;
+        }
+        .table-container, .number-container {
+            display: grid;
+            gap: 5px;
+            justify-content: center;
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 8px;
+            
+        }
+        .table-container {
+            grid-template-columns: repeat(18, 50px);
+        }
+        .number-container {
+            grid-template-columns: repeat(20, 50px); /* Adjust to make it more horizontal */
+        }
+        .element, .number-cell {
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            border: 1px solid #c7b299;
+            cursor: pointer;
+            background: linear-gradient(135deg, #f8f1e7, #e3d5c5);
+            
+
+            border-radius: 4px;
+            font-weight: 500;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .element:hover, .number-cell:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .correct {
+            background-color: #a5d6a7;
+        }
+        .wrong {
+            background-color: #ef9a9a;
+        }
+        .hidden {
+            display: none;
+        }
+        .question-container p {
+            margin: 0 10px;
+            font-size: 16px;
+            linear-gradient(135deg, #f8f1e7, #e3d5c5)
+        }
+        #question-text {
+            color: black;
+        }
+    </style>
+</head>
+<body>
+    <h1>Periodic Table Quiz</h1>
+    <div class="question-container">
+        <p>Question <span id="question-number">1</span>/10: <strong id="question-text"></strong></p>
+        <p id="score">Score: 0</p>
+    </div>
+    <div class="table-container" id="periodic-table"></div>
+    <div class="number-container" id="number-table"></div>
+    
+    <script>
+        const elements = ["H", "He", "Li", "Be", "B", "C", "N", "O", "F", "Ne", "Na", "Mg", "Al", "Si", "P", "S", "Cl", "Ar", "K", "Ca", "Sc", "Ti", "V", "Cr", "Mn", "Fe", "Co", "Ni", "Cu", "Zn", "Ga", "Ge", "As", "Se", "Br", "Kr", "Rb", "Sr", "Y", "Zr", "Nb", "Mo", "Tc", "Ru", "Rh", "Pd", "Ag", "Cd", "In", "Sn", "Sb", "Te", "I", "Xe"];
+        const numbers = Array.from({length: 118}, (_, i) => i + 1);
+        
+        const allQuestions = [ { question: "What is the symbol for Helium?", answer: "He" },
+    { question: "Which element has the atomic number 6?", answer: "C" },
+    { question: "What is the symbol for Magnesium?", answer: "Mg" },
+    { question: "Which element is the lightest metal?", answer: "Li" },
+    { question: "What is the symbol for Neon?", answer: "Ne" },
+    { question: "Which element is commonly used in balloons?", answer: "He" },
+    { question: "What is the symbol for Aluminum?", answer: "Al" },
+    { question: "Which element is essential for bones and teeth?", answer: "Ca" },
+    { question: "What is the atomic number of Chlorine?", answer: "17" },
+    { question: "What is the symbol for Potassium?", answer: "K" },
+    { question: "Which element is a noble gas with atomic number 36?", answer: "Kr" },
+    { question: "What is the symbol for Phosphorus?", answer: "P" },
+    { question: "Which element is used in thermometers?", answer: "Hg" },
+    { question: "What is the symbol for Arsenic?", answer: "As" },
+    { question: "Which element is commonly used in nuclear reactors?", answer: "U" },
+    { question: "What is the symbol for Tin?", answer: "Sn" },
+    { question: "Which element is a halogen with atomic number 53?", answer: "I" },
+    { question: "What is the symbol for Cobalt?", answer: "Co" },
+    { question: "Which element is used in making steel?", answer: "Fe" },
+    { question: "What is the atomic number of Nickel?", answer: "28" },
+    { question: "What is the symbol for Beryllium?", answer: "Be" },
+    { question: "Which element is known as the 'King of Poisons'?", answer: "As" },
+    { question: "What is the symbol for Radon?", answer: "Rn" },
+    { question: "Which element has the highest electrical conductivity?", answer: "Ag" },
+    { question: "What is the atomic number of Lead?", answer: "82" },
+    { question: "What is the symbol for Krypton?", answer: "Kr" },
+    { question: "Which element is commonly used in fireworks?", answer: "Mg" },
+    { question: "What is the atomic number of Zinc?", answer: "30" },
+    { question: "What is the symbol for Selenium?", answer: "Se" },
+    { question: "Which element is found in table salt?", answer: "Na" },
+    { question: "What is the symbol for Bromine?", answer: "Br" },
+    { question: "Which element is a metalloid with atomic number 5?", answer: "B" },
+    { question: "What is the symbol for Strontium?", answer: "Sr" },
+    { question: "Which element is used in X-ray shielding?", answer: "Pb" },
+    { question: "What is the atomic number of Silicon?", answer: "14" },
+    { question: "What is the symbol for Zirconium?", answer: "Zr" },
+    { question: "Which element is used in making stainless steel?", answer: "Cr" },
+    { question: "What is the atomic number of Rubidium?", answer: "37" },
+    { question: "What is the symbol for Tellurium?", answer: "Te" },
+    { question: "Which element is used in rechargeable batteries?", answer: "Li" },
+    { question: "What is the atomic number of Technetium?", answer: "43" },
+    { question: "What is the symbol for Polonium?", answer: "Po" },
+    { question: "Which element has the highest melting point?", answer: "W" },
+    { question: "What is the symbol for Cadmium?", answer: "Cd" },
+    { question: "Which element is essential for plant growth?", answer: "N" },
+    { question: "What is the atomic number of Antimony?", answer: "51" },
+    { question: "What is the symbol for Lanthanum?", answer: "La" },
+{ question: "Which element is used in matches?", answer: "P" },
+    { question: "What is the atomic number of Platinum?", answer: "78" }
+        ];
+        
+        let selectedQuestions = [];
+        let score = 0;
+        let currentQuestion = 0;
+        
+        function generateTable() {
+            const tableContainer = document.getElementById("periodic-table");
+            tableContainer.innerHTML = "";
+            elements.forEach(el => {
+                const cell = document.createElement("div");
+                cell.className = "element";
+                cell.textContent = el;
+                cell.addEventListener("click", () => checkAnswer(el, cell));
+                tableContainer.appendChild(cell);
+            });
+        }
+        
+        function generateNumberTable() {
+            const numberContainer = document.getElementById("number-table");
+            numberContainer.innerHTML = "";
+            numbers.forEach(num => {
+                const cell = document.createElement("div");
+                cell.className = "number-cell";
+                cell.textContent = num;
+                cell.addEventListener("click", () => checkAnswer(num.toString(), cell));
+                numberContainer.appendChild(cell);
+            });
+        }
+        
+        function selectRandomQuestions() {
+            selectedQuestions = allQuestions.sort(() => 0.5 - Math.random()).slice(0, 10);
+        }
+        
+        function setNewQuestion() {
+            if (currentQuestion < 10) {
+                document.getElementById("question-text").textContent = selectedQuestions[currentQuestion].question;
+                document.getElementById("question-number").textContent = currentQuestion + 1;
+            } else {
+                showPopup(score >= 6 ? "Congratulations! You Passed!" : "You Failed. Try Again!", true);
+            }
+        }
+        
+        function checkAnswer(selected, cell) {
+            if (currentQuestion < 10) {
+                if (selected === selectedQuestions[currentQuestion].answer) {
+                    cell.classList.add("correct");
+                    score++;
+                } else {
+                    cell.classList.add("wrong");
+                }
+                document.getElementById("score").textContent = `Score: ${score}`;
+                currentQuestion++;
+                setTimeout(() => {
+                    cell.classList.remove("correct", "wrong");
+                    setNewQuestion();
+                }, 1000);
+            }
+        }
+        
+        function showPopup(message, showRestart) {
+            alert(message);
+            if (showRestart) restartGame();
+        }
+        
+        function restartGame() {
+            score = 0;
+            currentQuestion = 0;
+            document.getElementById("score").textContent = "Score: 0";
+            selectRandomQuestions();
+            setNewQuestion();
+        }
+        
+        generateTable();
+        generateNumberTable();
+        selectRandomQuestions();
+        setNewQuestion();
+    </script>
+</body>
+</html>
